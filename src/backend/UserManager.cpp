@@ -13,7 +13,7 @@
 
 #include <utility>
 
-#define B64_LENGTH 524
+#define B64_LENGTH 525
 
 CUserManager::CUserManager(CCore &Core, QString UserFileWithPath, CUnsentChatMessageStorage &UnsentChatMessageStorage)
   : mCore(Core)
@@ -108,7 +108,8 @@ void CUserManager::loadUserList() {
 }
 
 void sanitizeB64Destination(QString I2PDestination){
-   I2PDestination.resize(525);
+   I2PDestination.chop(I2PDestination.length() - B64_LENGTH);
+   I2PDestination.resize(B64_LENGTH);
 }
 
 void CUserManager::saveUserList() {
