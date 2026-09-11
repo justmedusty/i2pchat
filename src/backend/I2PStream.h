@@ -53,8 +53,8 @@ public:
   void operator<<(const QByteArray &Data);
   void operator<<(const QString &Data);
 
-  void startUnlimintedReconnect(qint32 msec);
-  void stopUnlimintedReconnect();
+  void startUnlimitedReconnect(qint32 msec);
+  void stopUnlimitedReconnect();
 
 private slots:
   void slotConnected();
@@ -86,6 +86,11 @@ private:
   bool mHandshakeSuccessful;
   bool mDestinationReceived;
   bool mFIRSTPACKETCHAT_alreadySent;
+  int mReconnectAttempts;
+  const int MAX_RECONNECT_ATTEMPTS = 10;
+  const int INITIAL_RETRY_DELAY = 1000;
+  const int MAX_RETRY_DELAY = 30000;
+  QTimer *mReconnectTimer;
   QByteArray mIncomingPackets;
   QTcpSocket mTcpSocket;
   QTimer *mTimer;

@@ -760,7 +760,7 @@ void CCore::createStreamObjectForUser(CUser &User) {
           mProtocol,
           SLOT(slotInputUnknown(const qint32, const QByteArray)));
   t->doConnect(User.getI2PDestination());
-  t->startUnlimintedReconnect(msec);
+  t->startUnlimitedReconnect(msec);
 }
 
 void CCore::slotNewSamPrivKeyGenerated(const QString &SamPrivKey) {

@@ -85,8 +85,8 @@ public:
   bool getUsedB32Dest() const { return mUseB32Dest; };
   bool getAutoDownloadEnabled() const { return mAutoDownloadEnabled; };
   const QString getOriginalB32Address() const { return mOriginalB32Address; };
-  const QStringList getUnsentedMessages() const { return mUnsentedMessages; };
-  const QStringList getUnsentedFileOffers() const { return mUnsentedFileOffers; };
+  const QStringList getUnsentMessages() const { return mUnsentMessages; };
+  const QStringList getUnsentFileOffers() const { return mUnsentFileOffers; };
 
   void setConnectionStatus(CONNECTIONTOUSER Status);
   void setOnlineState(const ONLINESTATE newState);
@@ -105,8 +105,8 @@ public:
   void setReceivedNicknameToUserNickname();
   void setReplaceB32WithB64(QString b64Dest);
   void setAvatarImage(QByteArray &avatarImage);
-  void setUnsentedMessages(QStringList &newMessages);
-  void setUnsentedFileOffers(const QStringList &newOffers);
+  void setUnsentMessages(QStringList &newMessages);
+  void setUnsentFileOffers(const QStringList &newOffers);
   QString takeAcceptedFileOffer(const QString &fileName);
   void removeFileOffer(const QString &fileName);
   void cancelSentFileOffer(const QString &fileName);
@@ -172,7 +172,7 @@ private:
   QString mStatusNotifMsg;
   QTimer *mStatusNotifTimer;
   int mStatusNotifExpiryMs;
-  QStringList mUnsentedMessages;
+  QStringList mUnsentMessages;
   /* Cancel mechanism: mNextCancelId increments for each cancelP* call.
      mPendingMsgIdx / mPendingFileIdx map cancelId → index into mAllMessages
      so the caller can identify which pending msg/file-offer was cancelled. */
@@ -197,7 +197,7 @@ private:
   void
   removePendingByCancelId(qint32 id, const QString &linkPrefix, QMap<qint32, int> &idxMap, QStringList &unsentList);
 
-  QStringList mUnsentedFileOffers;
+  QStringList mUnsentFileOffers;
   QStringList mSentOfferStrs;
 };
 #endif

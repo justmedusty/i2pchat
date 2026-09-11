@@ -289,7 +289,7 @@ void CI2PStream::setConnectionType(const Type newTyp) {
   }
 }
 
-void CI2PStream::startUnlimintedReconnect(qint32 msec) {
+void CI2PStream::startUnlimitedReconnect(qint32 msec) {
   if (mTimer == NULL) {
     mTimer = new QTimer();
     connect(mTimer, SIGNAL(timeout()), this, SLOT(slotCheckForReconnect()));
@@ -297,7 +297,7 @@ void CI2PStream::startUnlimintedReconnect(qint32 msec) {
   mTimer->start(msec);
 }
 
-void CI2PStream::stopUnlimintedReconnect() {
+void CI2PStream::stopUnlimitedReconnect() {
   mTimer->stop();
   delete mTimer;
   mTimer = NULL;

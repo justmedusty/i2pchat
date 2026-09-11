@@ -13,6 +13,8 @@
 
 #include <utility>
 
+#define B64_LENGTH 524
+
 CUserManager::CUserManager(CCore &Core, QString UserFileWithPath, CUnsentChatMessageStorage &UnsentChatMessageStorage)
   : mCore(Core)
   , mUserFileWithPath(std::move(UserFileWithPath))
@@ -62,7 +64,7 @@ void CUserManager::loadUserList() {
           messages.erase(std::remove_if(messages.begin(), messages.end(), [](const QString &s) { return s.isEmpty(); }),
                          messages.end());
           if (!messages.isEmpty())
-            u->setUnsentedMessages(messages);
+            u->setUnsentMessages(messages);
         }
       }
 
@@ -71,7 +73,7 @@ void CUserManager::loadUserList() {
         QStringList offers = mUnsentMessageStorage.getFileOffersForDest(I2PDest);
         CUser *u = getUserByI2P_Destination(I2PDest);
         if (!offers.isEmpty() && u != NULL) {
-          u->setUnsentedFileOffers(offers);
+          u->setUnsentFileOffers(offers);
         }
       }
     } else if (temp[0] == "Invisible:") {
@@ -105,6 +107,10 @@ void CUserManager::loadUserList() {
   }
 }
 
+void sanitizeB64Destination(QString I2PDestination){
+   I2PDestination.resize(525);
+}
+
 void CUserManager::saveUserList() {
   QFile file(mCore.getConfigPath() + "/users.config");
   file.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -129,9 +135,9 @@ void CUserManager::saveUserList() {
 
     // save unsent items for this users
     const QString Dest = mUsers.at(i)->getI2PDestination();
-    const QStringList Messages = mUsers.at(i)->getUnsentedMessages();
+    const QStringList Messages = mUsers.at(i)->getUnsentMessages();
     mUnsentMessageStorage.saveChatMessagesForDest(Dest, Messages);
-    const QStringList Offers = mUsers.at(i)->getUnsentedFileOffers();
+    const QStringList Offers = mUsers.at(i)->getUnsentFileOffers();
     mUnsentMessageStorage.saveFileOffersForDest(Dest, Offers);
   }
   out.flush();
@@ -189,6 +195,7 @@ CUser *CUserManager::getUserByI2P_Destination(const QString &Destination) const 
   // Stored b32 addresses may be in legacy forms ("http://hash.b32.i2p",
   // stray whitespace), so both sides are normalized to the bare 52-char
   // hash before comparing.
+
   QString query = Destination.trimmed();
   const int scheme = query.indexOf(QStringLiteral("://"));
   if (scheme != -1)
@@ -196,9 +203,10 @@ CUser *CUserManager::getUserByI2P_Destination(const QString &Destination) const 
   if (query.endsWith(QStringLiteral(".b32.i2p"), Qt::CaseInsensitive))
     query.chop(8);
 
-  if (query.size() >= 500) {
+  if (query.size() >= 400) {
     // Query is a full base64 destination: derive its b32 hash and match
     // any contact stored as a b32 address.
+    sanitizeB64Destination(query);
     const QString b32 = toBase32Destination(query);
     if (!b32.isEmpty())
       for (auto it : mUsers) {
@@ -517,9 +525,9 @@ void CUserManager::avatarImageChanged() {
 void CUserManager::slotSaveUnsentMessageForDest(const QString &I2PDest) {
   CUser *theUser = getUserByI2P_Destination(I2PDest);
   if (theUser != NULL) {
-    const QStringList Messages = theUser->getUnsentedMessages();
+    const QStringList Messages = theUser->getUnsentMessages();
     mUnsentMessageStorage.saveChatMessagesForDest(I2PDest, Messages);
-    const QStringList Offers = theUser->getUnsentedFileOffers();
+    const QStringList Offers = theUser->getUnsentFileOffers();
     mUnsentMessageStorage.saveFileOffersForDest(I2PDest, Offers);
   } else {
     qWarning() << "File\t" << __FILE__ << Qt::endl
