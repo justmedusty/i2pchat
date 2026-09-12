@@ -64,3 +64,5 @@ private:
   bool deleteUserByI2P_Destination(const QString &Destination);
 };
 #endif // CUSERMANAGER_H
+
+void sanitizeB64Destination(QString I2PDestination);

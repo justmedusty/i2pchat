@@ -4,8 +4,8 @@
 
 #include <QDateTime>
 #include <QRegularExpression>
-
 #include <utility>
+#include "UserManager.h"
 
 const QString SAM_HANDSHAKE_V3 = "HELLO VERSION MIN=3.1 MAX=3.3\n";
 const int CONNECTIONTIMEOUT = 60 * 1000;
@@ -55,6 +55,10 @@ CI2PStream::~CI2PStream() {
 bool CI2PStream::doConnect(QString mDestination) {
   if (mMode != CONNECT) {
     return false;
+  }
+
+  if(mDestination.length() > 500){
+    sanitizeB64Destination(mDestination);
   }
 
   this->mDestination = std::move(mDestination);
@@ -223,6 +227,10 @@ void CI2PStream::slotReadFromSocket() {
       }
       if (mDestination.isEmpty())
         mDestination = line;
+    }
+
+    if(mDestination.length() < 500){
+      sanitizeB64Destination(mDestination);
     }
     mDestinationReceived = true;
 

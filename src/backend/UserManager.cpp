@@ -13,7 +13,7 @@
 
 #include <utility>
 
-#define B64_LENGTH 525
+#define B64_LENGTH 524
 
 CUserManager::CUserManager(CCore &Core, QString UserFileWithPath, CUnsentChatMessageStorage &UnsentChatMessageStorage)
   : mCore(Core)
@@ -108,8 +108,14 @@ void CUserManager::loadUserList() {
 }
 
 void sanitizeB64Destination(QString I2PDestination){
-   I2PDestination.chop(I2PDestination.length() - B64_LENGTH);
-   I2PDestination.resize(B64_LENGTH);
+    auto location = I2PDestination.indexOf(' ',0, Qt::CaseSensitivity::CaseInsensitive);
+
+    if(I2PDestination.length() == location){
+      return;
+    }
+
+   I2PDestination.chop(I2PDestination.length() - (location + 1));
+   I2PDestination.resize(I2PDestination.length() - (location + 1));
 }
 
 void CUserManager::saveUserList() {
@@ -165,6 +171,9 @@ CUser *CUserManager::getUserByI2P_ID(qint32 ID) const {
 QString CUserManager::toBase32Destination(const QString &b64Destination) {
   if (b64Destination.size() < 500)
     return QString();
+
+
+  sanitizeB64Destination(b64Destination);
 
   uint8_t raw[2048];
   size_t rawLen =

@@ -602,9 +602,15 @@ void CProtocol::handleChatProtocolPacket(const qint32 ID, const QByteArray &Data
     }
   }
 
+  auto streamDestination = stream->getDestination();
+  if(streamDestination.length() > 500){
+    sanitizeB64Destination(streamDestination);
+  }
+
   QByteArray Data2 = Data;
   Data2 = Data2.remove(0, Data.indexOf("\n") + 1);
-  if (mCore.getUserManager()->checkIfUserExistsByI2PDestination(stream->getDestination()) == false) {
+
+  if (mCore.getUserManager()->checkIfUserExistsByI2PDestination(streamDestination) == false) {
     QSettings settings(mCore.getConfigPath() + "/application.ini", QSettings::IniFormat);
     settings.beginGroup("Security");
     bool blockAllUnknown = settings.value("BlockAllUnknownUsers", false).toBool();
@@ -626,21 +632,21 @@ void CProtocol::handleChatProtocolPacket(const qint32 ID, const QByteArray &Data
                           SIGNAL(signDataReceived(const qint32, const QByteArray)),
                           this,
                           SLOT(slotInputUnknown(const qint32, const QByteArray)));
-      emit mCore.signIncomingUserAuthorizationRequest(stream->getDestination(), ID, Data);
+      emit mCore.signIncomingUserAuthorizationRequest(streamDestination, ID, Data);
       return;
     }
 
     bool added = false;
     if (versiond >= 0.3)
-      added = mCore.getUserManager()->addNewUser("...identifying...", stream->getDestination(), ID);
+      added = mCore.getUserManager()->addNewUser("...identifying...", streamDestination, ID);
     else
-      added = mCore.getUserManager()->addNewUser("Unknown", stream->getDestination(), ID);
+      added = mCore.getUserManager()->addNewUser("Unknown", streamDestination, ID);
 
     if (!added) {
       mCore.getConnectionManager()->doDestroyStreamObjectByID(ID);
       return;
     }
-    CUser *User = mCore.getUserManager()->getUserByI2P_Destination(stream->getDestination());
+    CUser *User = mCore.getUserManager()->getUserByI2P_Destination(streamDestination);
     if (User != NULL) {
       User->setI2PStreamID(ID);
       User->setProtocolVersion(version);
@@ -653,8 +659,8 @@ void CProtocol::handleChatProtocolPacket(const qint32 ID, const QByteArray &Data
       }
     }
   } else {
-    if (mCore.useThisChatConnection(stream->getDestination(), ID) == true) {
-      CUser *User = mCore.getUserManager()->getUserByI2P_Destination(stream->getDestination());
+    if (mCore.useThisChatConnection(streamDestination, ID) == true) {
+      CUser *User = mCore.getUserManager()->getUserByI2P_Destination(streamDestination);
       if (User != NULL) {
         User->setI2PStreamID(ID);
         User->setProtocolVersion(version);
