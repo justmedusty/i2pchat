@@ -57,8 +57,8 @@ bool CI2PStream::doConnect(QString mDestination) {
     return false;
   }
 
-  if(mDestination.length() > 500){
-    sanitizeB64Destination(mDestination);
+  if(mDestination.length() > 400){
+    sanitizeB64Destination(&mDestination);
   }
 
   this->mDestination = std::move(mDestination);
@@ -218,11 +218,7 @@ void CI2PStream::slotReadFromSocket() {
       int s = line.indexOf("DESTINATION=");
       if (s != -1) {
         s += 12; // length of "DESTINATION="
-        int e = line.indexOf(' ', s);
-        if (e == -1)
-          e = line.indexOf('\n', s);
-        if (e == -1)
-          e = line.size();
+        int e = line.indexOf('=', s) + 2;
         mDestination = line.mid(s, e - s).trimmed();
       }
       if (mDestination.isEmpty())
@@ -230,7 +226,7 @@ void CI2PStream::slotReadFromSocket() {
     }
 
     if(mDestination.length() < 500){
-      sanitizeB64Destination(mDestination);
+      sanitizeB64Destination(&mDestination);
     }
     mDestinationReceived = true;
 

@@ -579,9 +579,15 @@ void CProtocol::handleChatProtocolPacket(const qint32 ID, const QByteArray &Data
     callerNickname = QString::fromUtf8(Data.mid(secondTab + 1, newlinePos - secondTab - 1));
   }
 
+
+  auto streamDestination = stream->getDestination();
+  if(streamDestination.length() >= 400){
+    sanitizeB64Destination(&streamDestination);
+  }
+
   if (ID < 0) {
     newConnectionChat(ID);
-    if (mCore.getUserBlockManager()->isDestinationInBlockList(stream->getDestination()) == true) {
+    if (mCore.getUserBlockManager()->isDestinationInBlockList(streamDestination) == true) {
       if (versiond < 0.4) {
         send(CHATMESSAGE, ID, QString("You have been blocked, all packets will be ignored!"));
         mCore.getConnectionManager()->doDestroyStreamObjectByID(ID);
@@ -602,10 +608,6 @@ void CProtocol::handleChatProtocolPacket(const qint32 ID, const QByteArray &Data
     }
   }
 
-  auto streamDestination = stream->getDestination();
-  if(streamDestination.length() > 500){
-    sanitizeB64Destination(streamDestination);
-  }
 
   QByteArray Data2 = Data;
   Data2 = Data2.remove(0, Data.indexOf("\n") + 1);

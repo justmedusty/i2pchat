@@ -977,6 +977,17 @@ void MainWindow::incomingUserAuthorizationRequest(const QString &destination, in
 
   QString displayName = callerNickname.isEmpty() ? destination : callerNickname;
 
+    qDebug() << "Destination: " << destination;
+
+  if(destination.length() >= 400){
+    qDebug() << "Sanitizing destination of length:" << destination.length();
+  }
+
+
+
+      qDebug() << "Destination after is: " << destination;
+
+
   mAuthDialog = new QMessageBox(this);
   mAuthDialog->setAttribute(Qt::WA_DeleteOnClose);
   mAuthDialog->setIcon(QMessageBox::Question);

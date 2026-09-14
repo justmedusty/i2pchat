@@ -65,4 +65,4 @@ private:
 };
 #endif // CUSERMANAGER_H
 
-void sanitizeB64Destination(QString I2PDestination);
+void sanitizeB64Destination(QString *I2PDestination);

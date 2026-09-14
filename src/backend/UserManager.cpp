@@ -107,15 +107,20 @@ void CUserManager::loadUserList() {
   }
 }
 
-void sanitizeB64Destination(QString I2PDestination){
-    auto location = I2PDestination.indexOf(' ',0, Qt::CaseSensitivity::CaseInsensitive);
+void sanitizeB64Destination(QString *I2PDestination){
 
-    if(I2PDestination.length() == location){
+    if(I2PDestination->indexOf("FROM_PORT") != -1){
+      I2PDestination->resize(0,I2PDestination->indexOf("FROM_PORT") - 1);
+      return;
+    }
+    auto location = I2PDestination->indexOf("=",0, Qt::CaseSensitivity::CaseInsensitive) + 1;
+
+    if(I2PDestination->length() == location){
       return;
     }
 
-   I2PDestination.chop(I2PDestination.length() - (location + 1));
-   I2PDestination.resize(I2PDestination.length() - (location + 1));
+   I2PDestination->chop(I2PDestination->length() - (location + 1));
+   I2PDestination->resize(I2PDestination->length() - (location + 1));
 }
 
 void CUserManager::saveUserList() {
@@ -172,9 +177,6 @@ QString CUserManager::toBase32Destination(const QString &b64Destination) {
   if (b64Destination.size() < 500)
     return QString();
 
-
-  sanitizeB64Destination(b64Destination);
-
   uint8_t raw[2048];
   size_t rawLen =
     i2p::data::Base64ToByteStream(b64Destination.toUtf8().constData(), b64Destination.size(), raw, sizeof(raw));
@@ -216,7 +218,7 @@ CUser *CUserManager::getUserByI2P_Destination(const QString &Destination) const 
   if (query.size() >= 400) {
     // Query is a full base64 destination: derive its b32 hash and match
     // any contact stored as a b32 address.
-    sanitizeB64Destination(query);
+    sanitizeB64Destination(&query);
     const QString b32 = toBase32Destination(query);
     if (!b32.isEmpty())
       for (auto it : mUsers) {
@@ -423,6 +425,8 @@ bool CUserManager::addNewUser(QString Name,
 }
 
 bool CUserManager::checkIfUserExistsByI2PDestination(const QString &I2PDestination) const {
+
+
   if (I2PDestination == mCore.getMyDestination())
     return true;
 
