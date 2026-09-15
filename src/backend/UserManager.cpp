@@ -108,19 +108,10 @@ void CUserManager::loadUserList() {
 }
 
 void sanitizeB64Destination(QString *I2PDestination){
-
     if(I2PDestination->indexOf("FROM_PORT") != -1){
-      I2PDestination->resize(0,I2PDestination->indexOf("FROM_PORT") - 1);
+      I2PDestination->resize(0,I2PDestination->indexOf("FROM_PORT"));
       return;
     }
-    auto location = I2PDestination->indexOf("=",0, Qt::CaseSensitivity::CaseInsensitive) + 1;
-
-    if(I2PDestination->length() == location){
-      return;
-    }
-
-   I2PDestination->chop(I2PDestination->length() - (location + 1));
-   I2PDestination->resize(I2PDestination->length() - (location + 1));
 }
 
 void CUserManager::saveUserList() {

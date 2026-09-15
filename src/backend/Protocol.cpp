@@ -581,6 +581,7 @@ void CProtocol::handleChatProtocolPacket(const qint32 ID, const QByteArray &Data
 
 
   auto streamDestination = stream->getDestination();
+
   if(streamDestination.length() >= 400){
     sanitizeB64Destination(&streamDestination);
   }
