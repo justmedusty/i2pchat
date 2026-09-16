@@ -581,10 +581,17 @@ void CProtocol::handleChatProtocolPacket(const qint32 ID, const QByteArray &Data
 
 
   auto streamDestination = stream->getDestination();
+  emit mCore.getConnectionManager()->signDebugMessages(
+    QDateTime::currentDateTime().toString("hh:mm:ss") +
+    "streamDest BEFORE is " + streamDestination);
 
   if(streamDestination.length() >= 400){
     sanitizeB64Destination(&streamDestination);
   }
+
+  emit mCore.getConnectionManager()->signDebugMessages(
+    QDateTime::currentDateTime().toString("hh:mm:ss") +
+    "streamDest AFTER is " + streamDestination);
 
   if (ID < 0) {
     newConnectionChat(ID);

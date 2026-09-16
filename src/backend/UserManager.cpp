@@ -165,7 +165,7 @@ CUser *CUserManager::getUserByI2P_ID(qint32 ID) const {
   return NULL;
 }
 QString CUserManager::toBase32Destination(const QString &b64Destination) {
-  if (b64Destination.size() < 500)
+  if (b64Destination.size() < 400)
     return QString();
 
   uint8_t raw[2048];
@@ -209,6 +209,7 @@ CUser *CUserManager::getUserByI2P_Destination(const QString &Destination) const 
   if (query.size() >= 400) {
     // Query is a full base64 destination: derive its b32 hash and match
     // any contact stored as a b32 address.
+
     sanitizeB64Destination(&query);
     const QString b32 = toBase32Destination(query);
     if (!b32.isEmpty())
