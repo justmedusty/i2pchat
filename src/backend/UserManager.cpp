@@ -109,7 +109,7 @@ void CUserManager::loadUserList() {
 
 void sanitizeB64Destination(QString *I2PDestination){
     if(I2PDestination->indexOf("FROM_PORT") != -1){
-      I2PDestination->resize(I2PDestination->indexOf("FROM_PORT"));
+      I2PDestination->resize(I2PDestination->indexOf("FROM_PORT") - 1);
       return;
     }
 }
